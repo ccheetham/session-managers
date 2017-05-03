@@ -53,7 +53,7 @@ add something like the following to the backend's `build.gradle`:
 
 [source,sh]
 ----
-% cat <<EOF >mycooldb/build.gradle
+% cat <<EOF >>mycooldb/build.gradle
 shadowJar {
     manifest {
         attributes(
