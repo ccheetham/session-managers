@@ -44,11 +44,8 @@ Generated jar file names include the Tomcat version to identify which jar suppor
 To build for a different version of Tomcat, you can specify the property at the commandline.  For example, to build all versions:
 [source,sh]
 ----
-for v in 7 8 85 9; do ./gradlew assemble -PtomcatVersion=$v; done
+% for v in 7 8 85 9; do ./gradlew assemble -PtomcatVersion=$v; done
 ----
-
-
-=== Documentation
 
 To build project documentation:
 

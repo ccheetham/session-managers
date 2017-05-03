@@ -13,34 +13,33 @@ If you wish to contribute to the project, please be sure to read the {uri-projec
 
 == Overview
 
-The `tomcat` sub-project defines a `BackendStore`, an abstract implementation of `org.apache.catalina.Store`, providing:
+The `tomcat` sub-project defines `BackendStore`, an abstract implementation of `org.apache.catalina.Store`, providing:
 
 * Tomcat configuration hooks
 * Tomcat lifecycle support
 * Thread-safety
-* JMX support
 
 The `tomcat` sub-project also specifies an interface used by the `BackendStore` to persist sessions,
-`Backend` (`Backend`).
+`Backend`.
 
-== Backends
+== Stores
 
 === Gradle Setup
 
-Backends are implemented as Gradle sub-projects.
+Stores are implemented as Gradle sub-projects.
 
-To create a new backend, create a Gradle sub-project directory:
+To create a new store, create a Gradle sub-project directory:
 
 [source,sh]
 ----
-% mkdir mybackend
+% mkdir mycooldb
 ----
 
 Stub a `build.gradle` file:
 
 [source,sh]
 ----
-% cat <<EOF >mybackend/build.gradle
+% cat <<EOF >mycooldb/build.gradle
 dependencies {
     compile project(':tomcat')
 }
@@ -50,34 +49,29 @@ EOF
 Add the sub-project to the root project:
 [source,sh]
 ----
-% echo "include 'mybackend'" >>settings.gradle
+% echo "include 'mycooldb'" >>settings.gradle
 ----
 
-Assemble the new backend:
-[source,sh]
-----
-% ./gradlew :mybackend:assemble
-----
-
-To change the default name of the backend as returned by `getDescription()`, add something like the following to
-the backend's `build.gradle`:
+To change the default name of the backend as returned by `getDescription()` (used in logging),
+add something like the following to the backend's `build.gradle`:
 
 [source,sh]
 ----
-% cat <<EOF >mybackend/build.gradle
+% cat <<EOF >mycooldb/build.gradle
 shadowJar {
     manifest {
         attributes(
-                'Implementation-Title': 'My Backend',
+                'Implementation-Title': 'My Cool DB',
         )
     }
-}EOF
+}
+EOF
 ----
 
 
 === Implementation
 
-A Backend provides concrete implementations of a `BackendStore` and a `Backend`.
+A store implementation provides concrete implementations of a `BackendStore` and a `Backend`.
 
 At a minimum, the concrete `BackendStore` implements `getBackend()`, returning the concrete `Backend` to be used.
 
@@ -101,9 +95,9 @@ The `BackendStore` class is specified as the `className` attribute on a `Store` 
 ----
 
 Tomcat treats `Store` element attributes as Java bean properties.  To support configuration of a store property,
-implement a Java bean setter in the store implementation.
+provide a Java bean setter in the store implementation.
 
-For example, to support configuration of a store's hostname, in the store implemenation:
+For example, to support configuration of a store's hostname, in the store implementation:
 
 [source,java]
 ----
@@ -122,7 +116,7 @@ When Tomcat stops, the store's `stop()` is called before Tomcat exits.
 Once a store is started, if a property is changed, the store will be stopped and a new store instance will be
 constructed, repeating the above cycle.
 
-`Store` implementations should use `init()` to do any final configuration, `start()` to acquire resources,
+`BackendStore` implementations should use `init()` to do any final configuration, `start()` to acquire resources,
 and `stop()` to relinquish resources.
 
 == IDE Support
