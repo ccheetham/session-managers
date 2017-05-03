@@ -6,12 +6,12 @@ Pivotal AppSuite
 ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 :uri-project-contributor: link:CONTRIBUTOR{outfilesuffix}
 
-This document overviews how to develop core and backend features.
-For more specific details, please read the core's Javadocs.
+This document overviews how to develop core features and and additional stores.
+For more specific details, please read the Javadocs.
 
 If you wish to contribute to the project, please be sure to read the {uri-project-contributor}[contributor] guidelines.
 
-== Overview
+== Core Features
 
 The `tomcat` sub-project defines `BackendStore`, an abstract implementation of `org.apache.catalina.Store`, providing:
 
@@ -24,11 +24,7 @@ The `tomcat` sub-project also specifies an interface used by the `BackendStore` 
 
 == Stores
 
-=== Gradle Setup
-
-Stores are implemented as Gradle sub-projects.
-
-To create a new store, create a Gradle sub-project directory:
+To create a new store, create a directory for the sub-project :
 
 [source,sh]
 ----
@@ -67,9 +63,6 @@ shadowJar {
 }
 EOF
 ----
-
-
-=== Implementation
 
 A store implementation provides concrete implementations of a `BackendStore` and a `Backend`.
 
