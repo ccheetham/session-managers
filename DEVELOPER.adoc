@@ -24,14 +24,16 @@ The `tomcat` sub-project also specifies an interface used by the `BackendStore` 
 
 == Stores
 
-To create a new store, create a directory for the sub-project :
+=== Setup
+
+To create a sub-project for a new store, create a directory for the sub-project :
 
 [source,sh]
 ----
 % mkdir mycooldb
 ----
 
-Stub a `build.gradle` file:
+Stub the sub-project `build.gradle` file:
 
 [source,sh]
 ----
@@ -48,8 +50,8 @@ Add the sub-project to the root project:
 % echo "include 'mycooldb'" >>settings.gradle
 ----
 
-To change the default name of the backend as returned by `getDescription()` (used in logging),
-add something like the following to the backend's `build.gradle`:
+To change the default name of the store as returned by `getDescription()` (used in logging),
+add something like the following to the store's `build.gradle`:
 
 [source,sh]
 ----
@@ -64,17 +66,13 @@ shadowJar {
 EOF
 ----
 
+=== Implementation
+
 A store implementation provides concrete implementations of a `BackendStore` and a `Backend`.
 
 At a minimum, the concrete `BackendStore` implements `getBackend()`, returning the concrete `Backend` to be used.
 
-The concrete `BackendStore` may optionally implement setters for Java bean properties,
-allowing the store to be configured at runtime by Tomcat.  Bean property values are specified in `context.xml` as
-`Store` element attributes.
-
-The `BackendStore` implementation is configured in Tomcat in the instance's `conf/context.xml`.
-
-The `BackendStore` class is specified as the `className` attribute on a `Store` element:
+The `BackendStore` is configured in Tomcat as the `className` attribute on a `Store` element:
 
 [source,xml]
 ----
@@ -86,6 +84,10 @@ The `BackendStore` class is specified as the `className` attribute on a `Store` 
   ...
 </Context>
 ----
+
+The concrete `BackendStore` may optionally implement setters for Java bean properties,
+allowing the store to be configured at runtime by Tomcat.  Bean property values are specified in `context.xml` as
+`Store` element attributes.
 
 Tomcat treats `Store` element attributes as Java bean properties.  To support configuration of a store property,
 provide a Java bean setter in the store implementation.
@@ -100,6 +102,23 @@ For example, to support configuration of a store's hostname, in the store implem
         this.host = host;
     }
 ----
+
+The store host can now be configured by Tomcat:
+
+[source,xml]
+----
+<Context>
+  ...
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="io.pivotal.appsuite.tomcat.mybackend.MyBackendStore"
+        host="myhost"
+    />
+  </Manager>
+  ...
+</Context>
+----
+
+=== Lifecycle
 
 When Tomcat starts, the store specified by `className` is constructed.  Any configured properties are passed to the store via
 the setters.  After the properties have beens set, calls to `init()` and then `start()` ensue.
