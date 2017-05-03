@@ -1,0 +1,53 @@
+= Pivotal Redis Session Store (using Jedis)
+Pivotal AppSuite
+ifdef::env-github,env-browser[:outfilesuffix: .adoc]
+:linkattrs:
+:uri-jedis: https://github.com/xetorthio/jedis
+:uri-redis: https://redis.io/
+
+This sub-project provides an Apache Tomcat session store using the {uri-jedis}[Jedis, window="_new"] client pool library to
+manage sessions in a {uri-redis}[Redis, window="_new"] server.
+
+== Configuration
+
+Configure Tomcat using `Manager/Store` element in `context.xml`:
+
+[source,xml]
+----
+<Context>
+    ....
+    <Manager className="org.apache.catalina.session.PersistentManager">
+        <Store className="io.pivotal.appsuite.tomcat.jedis.RedisStore" />
+    </Manager>
+    ....
+</Context>
+----
+
+Override store default properties by adding attibutes to the `Manager/Store` element in `context.xml`:
+
+[source,xml]
+----
+<Context>
+    ....
+    <Manager className="org.apache.catalina.session.PersistentManager">
+        <Store className="io.pivotal.appsuite.tomcat.jedis.RedisStore"
+            host="myhost"
+            port="1234"
+            database="1"
+            password="mysecret"
+            connectionTimeout="5000"
+            connectionPoolSize="10"
+        />
+    </Manager>
+    ....
+</Context>
+----
+
+Properties:
+
+`host`:: Redis host (default `localhost`)
+`port`:: Redis port (default `6379`)
+`database`:: Redis database (default `0`)
+`password`:: Redis password (no default)
+`connectionTimeout`:: Redis connection timeout in milliseconds (default `2000`)
+`connectionPoolSize`:: Redis connection pool size (default `8`)

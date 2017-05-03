@@ -1,25 +1,30 @@
-= Pivotal Tomcat Session Managers
+= Pivotal Tomcat Session Stores
 Pivotal AppSuite
 :toc: preamble
 :toclevels: 1
 :!toc-title:
-:uri-contributing: link:CONTRIBUTING.adoc
+ifdef::env-github,env-browser[:outfilesuffix: .adoc]
+:linkattrs:
+:uri-project-build: link:BUILD{outfilesuffix}
+:uri-project-developer: link:DEVELOPER{outfilesuffix}
+:uri-project-jedis: link:jedis/README{outfilesuffix}
 :uri-apache-license: http://www.apache.org/licenses/LICENSE-2.0
 
-This project provides implementations of Tomcat session management.
+This project provides implementations of Tomcat session stores.
 
 == Goals
 
-* Provide a framework for implementing Tomcat session managers
-* Provide Tomcat session manager implementations for popular data stores
-* Support multiple versions of Tomcat
+* Provide a framework for implementing Apache Tomcat session stores
+* Provide Apache Tomcat session store implementations for popular data stores
 
-== Requirements
+== Available Tomcat Session Stores
 
-* JDK 7 or higher
+{uri-project-jedis}[Redis (via Jedis)]::
+Redis server and cluster support using the Jedis client libraries.
 
-== Building
+== Building/Developing
 
+Quick start:
 [source,sh]
 ----
 % git clone https://github.com/pivotalsoftware/session-managers
@@ -27,44 +32,10 @@ This project provides implementations of Tomcat session management.
 % ./gradlew assemble
 ----
 
-The project targets Java 7. If you use JDK 8 to run Gradle, you may see the following warning:
-[source,sh]
-----
-:common:compileJava
-warning: [options] bootstrap class path not set in conjunction with -source 1.7
-1 warning
-----
+For more details on building, see the {uri-project-build}[build] documentation.
 
-If you have JDK 7 available, set the env var `JDK7_HOME` to its path and it will be used for the Java compile bootstrap.
-
-== IDE Support
-
-=== IntelliJ
-
-[source,sh]
-----
-% ./gradlew idea
-----
-
-In IntelliJ, select _File->Open..._ and select the project directory.
-
-If prompted, _Import Gradle project_ to enable the _Gradle Tool Window_.  Using the default options should work, although a JDK 7 for the _Gradle JVM_ is recommended.
-
-=== Eclipse
-
-[source,sh]
-----
-% ./gradle eclipse
-----
-
-_These instructions work for Eclipse Neon._
-
-In Eclipse, select _File->Open Projects from File System..._ and select the project directory.  Click _Finish_ to import the projects.
-
-== Contributing
-
-Pull requests are welcome. See the {uri-contributing}[contributor guidelines] for details.
+For more details on developing core features and backends, see the {uri-project-developer}[developer] documentation.
 
 == License
 
-Free use of this project is granted under the terms of the {uri-apache-license}[Apache License, Version 2.0]
+Free use of this project is granted under the terms of the {uri-apache-license}["Apache License, Version 2.0", window="_blank"]

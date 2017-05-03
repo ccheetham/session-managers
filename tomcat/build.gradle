@@ -1,0 +1,9 @@
+dependencies {
+
+    compile(
+            group: 'org.apache.tomcat',
+            name: 'tomcat-catalina',
+            version: getProperty("tomcat${tomcatVersion}Version")
+    )
+
+}

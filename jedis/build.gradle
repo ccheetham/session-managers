@@ -1,0 +1,12 @@
+dependencies {
+    compile project(':tomcat')
+    compile "redis.clients:jedis:${jedisVersion}"
+}
+
+shadowJar {
+    manifest {
+        attributes(
+                'Implementation-Title': 'Redis Session Store (using Jedis)',
+        )
+    }
+}

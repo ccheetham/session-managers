@@ -1,13 +1,24 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
+    }
+}
+
+apply plugin: 'base'
 apply plugin: 'idea'
+apply plugin: 'org.asciidoctor.convert'
 
 subprojects {
     apply plugin: 'java'
-
     apply plugin: 'eclipse'
     eclipse {
-        project.name = "session-managers-${eclipse.project.name}"
+        project.name = "tomcat-session-store-${eclipse.project.name}"
         classpath {
-            defaultOutputDir = file('build/eclipse')
+            defaultOutputDir = new File(project.buildDir, 'eclipse')
         }
     }
 
@@ -16,13 +27,69 @@ subprojects {
     }
 
     dependencies {
-        testCompile group: 'junit', name: 'junit', version: junitVersion
+        compile "org.slf4j:slf4j-api:${slf4jVersion}"
+        testCompile "junit:junit:${junitVersion}"
+        runtime "org.slf4j:slf4j-jdk14:${slf4jVersion}"
     }
 
     sourceCompatibility = "1.${javaVersion}"
     targetCompatibility = "1.${javaVersion}"
-    if (System.getenv()["JDK${javaVersion}_HOME"])
-        compileJava.options.bootClasspath = "${System.getenv()["JDK${javaVersion}_HOME"]}/jre/lib/rt.jar"
+    compileJava {
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        if (System.getenv()["JDK${javaVersion}_HOME"])
+            options.bootClasspath = "${System.getenv()["JDK${javaVersion}_HOME"]}/jre/lib/rt.jar"
+    }
 
-    jar.baseName = "pivotal-tomcat-session-manager"
+    sourceSets {
+        main {
+            java {
+                srcDirs = ["src/main/java", "src/main/java-v${tomcatVersion}"]
+            }
+        }
+    }
+
+    jar.baseName = "${rootProject.name}-tomcat${tomcatVersion}"
+    if (name != 'tomcat') {
+        jar.baseName += "-${name}"
+        apply plugin: 'com.github.johnrengelman.shadow'
+        shadowJar {
+            baseName = jar.baseName
+            exclude '**/pom.*'
+            dependencies {
+                exclude(dependency('org.apache.tomcat::'))
+            }
+            manifest {
+                attributes(
+                        'Implementation-Title': "${project.name.capitalize()} Session Store",
+                        'Implementation-Version': project.version,
+                        'Implementation-Vendor': 'Pivotal'
+                )
+            }
+        }
+        assemble {
+            dependsOn shadowJar
+        }
+    }
+}
+
+task javadoc(type: Javadoc) {
+    source subprojects.collect {
+        it.sourceSets.main.allJava
+    }
+    classpath = files(subprojects.collect {
+        it.sourceSets.main.compileClasspath
+    })
+    options.memberLevel = 'PACKAGE'
+    options.links("http://docs.oracle.com/javase/${javaVersion}/docs/api/", "https://tomcat.apache.org/tomcat-8.5-doc/api/");
+    destinationDir = file("${buildDir}/docs/javadocs")
+}
+
+asciidoctor {
+    sourceDir = projectDir
+
+    outputDir = new File(project.buildDir, 'docs')
+}
+
+task doc() {
+    dependsOn javadoc, asciidoctor
 }

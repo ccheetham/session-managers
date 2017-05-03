@@ -1,2 +1,3 @@
-rootProject.name = 'tomcat-session-managers'
-include 'common'
+rootProject.name = 'pivotal-session-store'
+include 'tomcat'
+include 'jedis'
