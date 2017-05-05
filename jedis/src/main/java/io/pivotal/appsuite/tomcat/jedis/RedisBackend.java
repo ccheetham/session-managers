@@ -98,7 +98,7 @@ class RedisBackend implements Backend {
 
     @Override
     public void clear() throws IOException {
-        byte[][] keys = keys().toArray(new byte[0][]);
+        byte[][] keys = keys();
         try (Jedis j = jedisPool.getResource()) {
             Transaction t = j.multi();
             t.srem(KEYS, keys);
@@ -117,9 +117,9 @@ class RedisBackend implements Backend {
     }
 
     @Override
-    public Set<byte[]> keys() throws IOException {
+    public byte[][] keys() throws IOException {
         try (Jedis j = jedisPool.getResource()) {
-            return j.smembers(KEYS);
+            return j.smembers(KEYS).toArray(new byte[0][]);
         }
     }
 

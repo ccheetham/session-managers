@@ -227,13 +227,13 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
         log.debug("getting session keys");
         lock.readLock().lock();
         try {
-            Set<byte[]> keySet = backend.keys();
-            String[] keys = new String[keySet.size()];
+            byte[][] keyBytesArray = backend.keys();
+            String[] keyStrings = new String[keyBytesArray.length];
             int i = 0;
-            for (byte[] key : keySet) {
-                keys[i++] = idFromBytes(key);
+            for (byte[] keyBytes : keyBytesArray) {
+                keyStrings[i++] = idFromBytes(keyBytes);
             }
-            return keys;
+            return keyStrings;
         } finally {
             lock.readLock().unlock();
         }

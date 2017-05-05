@@ -68,6 +68,6 @@ public interface Backend {
      * @return the keys contained in this backend
      * @throws IOException if an I/O error occurs
      */
-    Set<byte[]> keys() throws IOException;
+    byte[][] keys() throws IOException;
 
 }

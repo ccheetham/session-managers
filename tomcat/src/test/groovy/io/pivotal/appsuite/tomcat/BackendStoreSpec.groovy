@@ -225,10 +225,11 @@ class BackendStoreSpec extends Specification {
         }
 
         @Override
-        Set<byte[]> keys() throws IOException {
-            Set<byte[]> keys = []
+        byte[][] keys() throws IOException {
+            byte[][] keys = new byte[sessions.size()][]
+            def i = 0
             for (String key: sessions.keySet()) {
-                keys.add(key.getBytes())
+                keys[i++] = key.getBytes()
             }
             return keys
         }
