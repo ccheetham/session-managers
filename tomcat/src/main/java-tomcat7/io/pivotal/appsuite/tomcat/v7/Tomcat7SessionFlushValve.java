@@ -11,8 +11,6 @@ import java.io.IOException;
 public class Tomcat7SessionFlushValve extends SessionFlushValve {
 
     @Override
-    public void event(Request request, Response response, CometEvent event) throws IOException, ServletException {
-        // noop
-    }
+    public void event(Request request, Response response, CometEvent event) throws IOException, ServletException {}
 
 }
