@@ -1,9 +1,11 @@
 package io.pivotal.appsuite.tomcat.jedis;
 
+import io.pivotal.appsuite.tomcat.BackendStoreConfiguration;
+
 /**
  * An interface defining configured {@link RedisStore} properties.
  */
-public interface RedisConfiguration {
+public interface RedisConfiguration extends BackendStoreConfiguration {
 
     /**
      * Return the Redis host.

@@ -1,9 +1,6 @@
 package io.pivotal.appsuite.tomcat;
 
-import org.apache.catalina.Lifecycle;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleListener;
-import org.apache.catalina.LifecycleState;
+import org.apache.catalina.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,22 +9,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The Apache Tomcat {@link Lifecycle} state-machine for a {@link BackendStore}.
+ * The Apache Tomcat {@link Lifecycle} state machine.
  */
-class BackendStoreLifecycle implements Lifecycle {
+public class LifecycleStateMachine implements Lifecycle {
 
     private final Logger log;
 
-    private final BackendStore backendStore;
+    private final LifecycleContext context;
 
     private volatile Lifecycle state;
 
     private final Set<LifecycleListener> lifecycleListeners;
 
-
-    BackendStoreLifecycle(BackendStore backendStore) {
-        log = LoggerFactory.getLogger(getClass());
-        this.backendStore = backendStore;
+    LifecycleStateMachine(LifecycleContext context) {
+        log = LoggerFactory.getLogger(context.getClass());
+        this.context = context;
         lifecycleListeners = Collections.synchronizedSet(new HashSet<LifecycleListener>());
         state = new NewState();
     }
@@ -103,23 +99,22 @@ class BackendStoreLifecycle implements Lifecycle {
 
         @Override
         public void init() throws LifecycleException {
-            throw new LifecycleException("unsupported state transition: init");
-
+            throw new LifecycleException(String.format("Invalid state transition: %s->init()", getStateName()));
         }
 
         @Override
         public void start() throws LifecycleException {
-            throw new LifecycleException("unsupported state transition: start");
+            throw new LifecycleException(String.format("Invalid state transition: %s->start()", getStateName()));
         }
 
         @Override
         public void stop() throws LifecycleException {
-            throw new LifecycleException("unsupported state transition: stop");
+            throw new LifecycleException(String.format("Invalid state transition: %s->stop()", getStateName()));
         }
 
         @Override
         public void destroy() throws LifecycleException {
-            throw new LifecycleException("unsupported state transition: destroy");
+            throw new LifecycleException(String.format("Invalid state transition: %s->destroy()", getStateName()));
         }
 
         @Override
@@ -133,7 +128,21 @@ class BackendStoreLifecycle implements Lifecycle {
         }
     }
 
-    private class NewState extends State {
+    private abstract class DestroyableState extends State {
+
+        private DestroyableState(LifecycleState lifecycleState) {
+            super(lifecycleState);
+        }
+
+        @Override
+        public void destroy() throws LifecycleException {
+            state = new DestroyingState();
+            state.destroy();
+        }
+
+    }
+
+    private class NewState extends DestroyableState {
 
         private NewState() {
             super(LifecycleState.NEW);
@@ -166,16 +175,26 @@ class BackendStoreLifecycle implements Lifecycle {
 
         @Override
         public void init() throws LifecycleException {
-            backendStore.getBackend().init();
+            try {
+                context.doInit();
+            } catch (Throwable t) {
+                state = new FailedState();
+                throw new LifecycleException(t);
+            }
             state = new InitializedState();
         }
 
     }
 
-    private class InitializedState extends State {
+    private class InitializedState extends DestroyableState {
 
         private InitializedState() {
             super(LifecycleState.INITIALIZED);
+        }
+
+        @Override
+        public void init() throws LifecycleException {
+            // noop
         }
 
         @Override
@@ -208,7 +227,12 @@ class BackendStoreLifecycle implements Lifecycle {
 
         @Override
         public void start() throws LifecycleException {
-            backendStore.getBackend().start();
+            try {
+                context.doStart();
+            } catch (Throwable t) {
+                state = new FailedState();
+                throw new LifecycleException(t);
+            }
             state = new StartedState();
         }
 
@@ -218,6 +242,11 @@ class BackendStoreLifecycle implements Lifecycle {
 
         private StartedState() {
             super(LifecycleState.STARTED);
+        }
+
+        @Override
+        public void start() throws LifecycleException {
+            // noop
         }
 
         @Override
@@ -250,22 +279,26 @@ class BackendStoreLifecycle implements Lifecycle {
 
         @Override
         public void stop() throws LifecycleException {
-            backendStore.getBackend().stop();
+            try {
+                context.doStop();
+            } catch (Throwable t) {
+                state = new FailedState();
+                throw new LifecycleException(t);
+            }
             state = new StoppedState();
         }
 
     }
 
-    private class StoppedState extends State {
+    private class StoppedState extends DestroyableState {
 
         private StoppedState() {
             super(LifecycleState.STOPPED);
         }
 
         @Override
-        public void destroy() throws LifecycleException {
-            state = new DestroyingState();
-            state.destroy();
+        public void stop() throws LifecycleException {
+            // noop
         }
 
     }
@@ -278,12 +311,18 @@ class BackendStoreLifecycle implements Lifecycle {
 
         @Override
         public void destroy() throws LifecycleException {
+            try {
+                context.doDestroy();
+            } catch (Throwable t) {
+                state = new FailedState();
+                throw new LifecycleException(t);
+            }
             state = new DestroyedState();
         }
 
     }
 
-    private class DestroyedState extends State {
+    private class DestroyedState extends DestroyableState {
 
         private DestroyedState() {
             super(LifecycleState.DESTROYED);
@@ -291,7 +330,7 @@ class BackendStoreLifecycle implements Lifecycle {
 
     }
 
-    private class FailedState extends State {
+    private class FailedState extends DestroyableState {
 
         private FailedState() {
             super(LifecycleState.FAILED);

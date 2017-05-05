@@ -64,10 +64,10 @@ public interface Backend {
     int size() throws IOException;
 
     /**
-     * Returns a Set view of the keys contained in this backend.
-     * @return a set view of the keys contained in this backend
+     * Returns the keys contained in this backend.
+     * @return the keys contained in this backend
      * @throws IOException if an I/O error occurs
      */
-    Set<byte[]> keySet() throws IOException;
+    Set<byte[]> keys() throws IOException;
 
 }

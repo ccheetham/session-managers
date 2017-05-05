@@ -8,14 +8,11 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Protocol;
 
 /**
- * An Apache Tomcat session store using a <a href="https://github.com/xetorthio/jedis" target="_new">Jedis</a> client
- * to connect to a <a href="https://redis.io/" target="_new">Redis</a> data store.
+ * An Apache Tomcat session store backended by <a href="https://redis.io/" target="_new">Redis</a> data store.
  */
 public class RedisStore extends BackendStore implements RedisManagement {
 
-    private final Logger logger;
-
-    private final RedisBackend backend;
+    private final Logger log;
 
     // RedisManagement fields
     private String host;
@@ -29,19 +26,19 @@ public class RedisStore extends BackendStore implements RedisManagement {
      * Create a new {@code RedisStore}.
      */
     public RedisStore() {
-        logger = LoggerFactory.getLogger(getClass());
-        backend = new RedisBackend(this);
+        log = LoggerFactory.getLogger(getClass());
         host = Protocol.DEFAULT_HOST;
         port = Protocol.DEFAULT_PORT;
         database = Protocol.DEFAULT_DATABASE;
         connectionTimeout = Protocol.DEFAULT_TIMEOUT;
         connectionPoolSize = JedisPoolConfig.DEFAULT_MAX_TOTAL;
         password = null;
+        log.info(getDescription());
     }
 
     @Override
-    public Backend getBackend() {
-        return backend;
+    public Backend createBackend() {
+        return new RedisBackend(this);
     }
 
     // -----------------------------------------------------------------------
@@ -56,7 +53,7 @@ public class RedisStore extends BackendStore implements RedisManagement {
 
     @Override
     public void setHost(String host) {
-        logger.debug("setting host to {}", host);
+        log.debug("setting host to {}", host);
         this.host = host;
     }
 
@@ -67,7 +64,7 @@ public class RedisStore extends BackendStore implements RedisManagement {
 
     @Override
     public void setPort(int port) {
-        logger.debug("setting port to {}", port);
+        log.debug("setting port to {}", port);
         this.port = port;
     }
 
@@ -78,7 +75,7 @@ public class RedisStore extends BackendStore implements RedisManagement {
 
     @Override
     public void setDatabase(int datbase) {
-        logger.debug("setting database to {}", database);
+        log.debug("setting database to {}", database);
         this.database = database;
     }
 
@@ -89,7 +86,7 @@ public class RedisStore extends BackendStore implements RedisManagement {
 
     @Override
     public void setPassword(String password) {
-        logger.debug("setting password to {}", password);
+        log.debug("setting password to {}", password);
         this.password = password;
     }
 
@@ -100,7 +97,7 @@ public class RedisStore extends BackendStore implements RedisManagement {
 
     @Override
     public void setConnectionTimeout(int timeout) {
-        logger.debug("setting timeout to {}", timeout);
+        log.debug("setting timeout to {}", timeout);
         this.connectionTimeout = timeout;
     }
 
@@ -111,7 +108,7 @@ public class RedisStore extends BackendStore implements RedisManagement {
 
     @Override
     public void setConnectionPoolSize(int size) {
-        logger.debug("setting connection pool size to {}", size);
+        log.debug("setting connection pool size to {}", size);
         this.connectionPoolSize = size;
     }
 

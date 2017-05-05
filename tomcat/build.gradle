@@ -5,5 +5,10 @@ dependencies {
             name: 'tomcat-catalina',
             version: getProperty("tomcat${tomcatVersion}Version")
     )
+    testCompile(
+            group: 'org.apache.tomcat',
+            name: 'tomcat-coyote',
+            version: getProperty("tomcat${tomcatVersion}Version")
+    )
 
 }

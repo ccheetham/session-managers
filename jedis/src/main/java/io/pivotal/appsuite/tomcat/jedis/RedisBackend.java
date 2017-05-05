@@ -3,6 +3,7 @@ package io.pivotal.appsuite.tomcat.jedis;
 import io.pivotal.appsuite.tomcat.Backend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Transaction;
@@ -12,8 +13,8 @@ import java.nio.charset.Charset;
 import java.util.Set;
 
 /**
- * A {@link Backend} that uses a <a href="https://github.com/xetorthio/jedis" target="_new">Jedis</a> client to
- * manage mappings with a Redis backend.
+ * A {@link Backend} that uses a <a href="https://github.com/xetorthio/jedis" target="_new">Jedis</a> client pool to
+ * manage mappings in a <a href="https://redis.io/" target="_new">Redis</a> data store
  */
 class RedisBackend implements Backend {
 
@@ -27,13 +28,13 @@ class RedisBackend implements Backend {
     private JedisPool jedisPool;
 
     RedisBackend(RedisConfiguration config) {
-        log = LoggerFactory.getLogger(RedisBackend.class);
+        log = LoggerFactory.getLogger(getClass());
         this.config = config;
     }
 
     @Override
     public void init() {
-        log.info("initializing");
+        log.debug("initializing");
         log.debug("... host -> {}", this.config.getHost());
         log.debug("... port -> {}", this.config.getPort());
         log.debug("... database -> {}", this.config.getDatabase());
@@ -44,7 +45,7 @@ class RedisBackend implements Backend {
 
     @Override
     public void start() {
-        log.info("starting");
+        log.debug("starting");
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(config.getConnectionPoolSize());
         poolConfig.setTestOnBorrow(true);
@@ -62,50 +63,64 @@ class RedisBackend implements Backend {
 
     @Override
     public void stop() {
-        log.info("stopping");
+        log.debug("stopping");
         jedisPool.close();
         jedisPool = null;
     }
 
     @Override
     public void put(byte[] key, byte[] value) throws IOException {
-        Transaction t = jedisPool.getResource().multi();
-        t.set(key, value);
-        t.sadd(KEYS, key);
-        t.exec();
+        log.debug("putting {}", new String(key));
+        try (Jedis j = jedisPool.getResource()) {
+            Transaction t = j.multi();
+            t.set(key, value);
+            t.sadd(KEYS, key);
+            t.exec();
+        }
     }
 
     @Override
     public byte[] get(byte[] key) throws IOException {
-        return jedisPool.getResource().get(key);
+        try (Jedis j = jedisPool.getResource()) {
+            return j.get(key);
+        }
     }
 
     @Override
     public void remove(byte[] key) throws IOException {
-        Transaction t = jedisPool.getResource().multi();
-        t.srem(KEYS, key);
-        t.del(key);
-        t.exec();
+        try (Jedis j = jedisPool.getResource()) {
+            Transaction t = j.multi();
+            t.srem(KEYS, key);
+            t.del(key);
+            t.exec();
+        }
     }
 
     @Override
     public void clear() throws IOException {
-        byte[][] keys = keySet().toArray(new byte[0][]);
-        Transaction t = jedisPool.getResource().multi();
-        t.srem(KEYS, keys);
-        for (int i = 0; i < keys.length; ++i) {
-            t.del(keys[i]);
+        byte[][] keys = keys().toArray(new byte[0][]);
+        try (Jedis j = jedisPool.getResource()) {
+            Transaction t = j.multi();
+            t.srem(KEYS, keys);
+            for (int i = 0; i < keys.length; ++i) {
+                t.del(keys[i]);
+            }
+            t.exec();
         }
-        t.exec();
     }
 
     @Override
     public int size() throws IOException {
-        return jedisPool.getResource().scard(KEYS).intValue();
+        try (Jedis j = jedisPool.getResource()) {
+            return j.scard(KEYS).intValue();
+        }
     }
 
     @Override
-    public Set<byte[]> keySet() throws IOException {
-        return jedisPool.getResource().smembers(KEYS);
+    public Set<byte[]> keys() throws IOException {
+        try (Jedis j = jedisPool.getResource()) {
+            return j.smembers(KEYS);
+        }
     }
+
 }
