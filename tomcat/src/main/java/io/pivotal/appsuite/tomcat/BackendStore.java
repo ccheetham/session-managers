@@ -49,10 +49,7 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
     }
 
     /**
-     * Return a description of this store.
-     * Description is of the form <i>"vendor title/version"</i> as specified by
-     * {@link Package#getImplementationVendor()}, {@link Package#getImplementationTitle}, and
-     * {@link Package#getImplementationVersion()}, respectively.
+     * Return a description of this store in in Tomcat's preferred style.
      *
      * @return store description
      */
@@ -194,9 +191,9 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
 
     @Override
     public Session load(String id) throws ClassNotFoundException, IOException {
+        log.debug("loading session {}", id);
         lock.readLock().lock();
         try {
-            log.debug("loading session {}", id);
             return sessionFromBytes(backend.get(idToBytes(id)));
         } finally {
             lock.readLock().unlock();
@@ -205,9 +202,9 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
 
     @Override
     public void remove(String id) throws IOException {
+        log.debug("removing session {}", id);
         lock.readLock().lock();
         try {
-            log.debug("removing session {}", id);
             backend.remove(idToBytes(id));
         } finally {
             lock.readLock().unlock();
@@ -216,9 +213,9 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
 
     @Override
     public int getSize() throws IOException {
+        log.debug("getting session count");
         lock.readLock().lock();
         try {
-            log.debug("getting session count");
             return backend.size();
         } finally {
             lock.readLock().unlock();
@@ -227,9 +224,9 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
 
     @Override
     public String[] keys() throws IOException {
+        log.debug("getting session keys");
         lock.readLock().lock();
         try {
-            log.debug("getting session keys");
             Set<byte[]> keySet = backend.keys();
             String[] keys = new String[keySet.size()];
             int i = 0;
@@ -244,9 +241,9 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
 
     @Override
     public void clear() throws IOException {
+        log.debug("clearing sessions");
         lock.readLock().lock();
         try {
-            log.debug("clearing sessions");
             backend.clear();
         } finally {
             lock.readLock().unlock();
