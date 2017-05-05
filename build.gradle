@@ -84,7 +84,7 @@ task javadoc(type: Javadoc) {
         it.sourceSets.main.compileClasspath
     })
     options.memberLevel = 'PACKAGE'
-    options.links("http://docs.oracle.com/javase/${javaVersion}/docs/api/", "https://tomcat.apache.org/tomcat-8.5-doc/api/");
+    options.links("http://docs.oracle.com/javase/${javaVersion}/docs/api/", "https://docs.oracle.com/javaee/${javaVersion}/api/", "https://tomcat.apache.org/tomcat-8.5-doc/api/");
     destinationDir = file("${buildDir}/docs/javadocs")
 }
 
