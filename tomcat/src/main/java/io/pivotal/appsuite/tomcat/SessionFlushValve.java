@@ -10,7 +10,7 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 
 /**
- * A {@link Valve} that flushes a {@link Session} to a {@link BackendStore} after an HTTP request.
+ * A {@link Valve} that flushes a {@link Session} to a {@link Store} after an HTTP request.
  */
 public abstract class SessionFlushValve implements Valve, Contained {
 
@@ -30,11 +30,11 @@ public abstract class SessionFlushValve implements Valve, Contained {
     }
 
     /**
-     * Called by a {@link BackendStore} upon receiving this instance.
+     * Set the {@link Store} to which to flush sessions.
      *
-     * @param store the associated {@code BackendStore}
+     * @param store the associated {@code Store}
      */
-    void setStore(BackendStore store) {
+    void setStore(Store store) {
         this.store = store;
     }
 
@@ -62,7 +62,7 @@ public abstract class SessionFlushValve implements Valve, Contained {
 
     /**
      * Invokes the next {@link Valve} in the {@link Pipeline} and then saves the {@link Session}, if one exists,
-     * in the associated {@link BackendStore}.
+     * in the associated {@link Store}.
      *
      * @param request  HTTP request
      * @param response HTTP response
