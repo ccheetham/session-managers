@@ -4,6 +4,7 @@ ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 :linkattrs:
 :uri-jedis: https://github.com/xetorthio/jedis
 :uri-redis: https://redis.io/
+:uri-session-flush-valve: link:../tomcat/src/main/java/io/pivotal/appsuite/tomcat/SessionFlushValve.java
 
 This sub-project provides an Apache Tomcat session store using the {uri-jedis}[Jedis, window="_new"] client pool library to
 manage sessions in a {uri-redis}[Redis, window="_new"] server.
@@ -37,6 +38,7 @@ Override store default properties by adding attibutes to the `Manager/Store` ele
             password="mysecret"
             connectionTimeout="5000"
             connectionPoolSize="10"
+            sessionFlushValveEnabled="true"
         />
     </Manager>
     ....
@@ -51,3 +53,4 @@ Properties:
 `password`:: Redis password (no default)
 `connectionTimeout`:: Redis connection timeout in milliseconds (default `2000`)
 `connectionPoolSize`:: Redis connection pool size (default `8`)
+`sessionFlushValveEnabled`:: Whether to enable the {uri-session-flush-valve}[SessionFlushValve] (default `false`)
