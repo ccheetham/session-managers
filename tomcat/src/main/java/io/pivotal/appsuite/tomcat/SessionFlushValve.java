@@ -14,6 +14,8 @@ import java.io.IOException;
  */
 public abstract class SessionFlushValve implements Valve, Contained {
 
+    private final boolean DONT_CREATE = false;
+
     private final Logger log;
 
     private Valve next;
@@ -69,10 +71,10 @@ public abstract class SessionFlushValve implements Valve, Contained {
      */
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
-        if (next != null) {
-            next.invoke(request, response);
+        if (getNext() != null) {
+            getNext().invoke(request, response);
         }
-        Session session = request.getSessionInternal(false);
+        Session session = request.getSessionInternal(DONT_CREATE);
         if (session != null && session.isValid()) {
             log.debug("flushing {}", session.getId());
             store.save(session);
@@ -90,9 +92,7 @@ public abstract class SessionFlushValve implements Valve, Contained {
     }
 
     @Override
-    public void backgroundProcess() {
-        log.info("BACKGROUND PROCESS");
-    }
+    public void backgroundProcess() {}
 
     @Override
     public boolean isAsyncSupported() {
