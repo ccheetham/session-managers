@@ -1,6 +1,5 @@
 package io.pivotal.appsuite.tomcat.v9;
 
-import io.pivotal.appsuite.tomcat.BackendStore;
 import io.pivotal.appsuite.tomcat.SessionFlushValve;
 import io.pivotal.appsuite.tomcat.TomcatAdapter;
 import org.apache.catalina.*;
@@ -17,7 +16,7 @@ import java.io.ObjectInputStream;
 public class Tomcat9Adapter implements TomcatAdapter {
 
     @Override
-    public Pipeline getPipeline(BackendStore store) {
+    public Pipeline getPipeline(Store store) {
         return store.getManager().getContext().getPipeline();
     }
 
@@ -31,7 +30,7 @@ public class Tomcat9Adapter implements TomcatAdapter {
      * <a href="http://svn.apache.org/repos/asf/tomcat/tc9.0.x/branches/gsoc-jaspic/java/org/apache/catalina/session/FileStore.java" target="_new">org/apache/catalina/session/FileStore.java</a>.
      */
     @Override
-    public Session sessionFromBytes(BackendStore store, byte[] bytes) throws IOException, ClassNotFoundException {
+    public Session sessionFromBytes(Store store, byte[] bytes) throws IOException, ClassNotFoundException {
         Manager manager = store.getManager();
         Context context = manager.getContext();
         Loader loader = null;
