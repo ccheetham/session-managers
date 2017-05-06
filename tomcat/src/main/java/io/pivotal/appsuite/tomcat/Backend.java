@@ -17,14 +17,18 @@ public interface Backend {
     /**
      * Start store backend, acquiring any needed system resources.
      * When this returns, the store should be ready to manager session data.
+     *
+     * @throws IOException if an I/O error error occurs
      */
-    void start();
+    void start() throws IOException;
 
     /**
      * Stop the store backend, releasing any acquired system resources.
      * When this returns, the store will no longer be able to manager session data.
+     *
+     * @throws IOException if an I/O error error occurs
      */
-    void stop();
+    void stop() throws IOException;
 
     /**
      * Associates the specified value with the specified key in this backend.

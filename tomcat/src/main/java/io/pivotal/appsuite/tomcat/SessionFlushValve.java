@@ -26,7 +26,6 @@ public abstract class SessionFlushValve implements Valve, Contained {
 
     public SessionFlushValve() {
         log = LoggerFactory.getLogger(getClass());
-        log.info(getInfo());
     }
 
     /**
@@ -76,7 +75,7 @@ public abstract class SessionFlushValve implements Valve, Contained {
         }
         Session session = request.getSessionInternal(DONT_CREATE);
         if (session != null && session.isValid()) {
-            log.debug("flushing {}", session.getId());
+            log.debug("Flushing {}", session.getId());
             store.save(session);
         }
     }

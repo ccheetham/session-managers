@@ -1,9 +1,6 @@
 package io.pivotal.appsuite.tomcat;
 
-import org.apache.catalina.Lifecycle;
-import org.apache.catalina.Manager;
-import org.apache.catalina.Session;
-import org.apache.catalina.Store;
+import org.apache.catalina.*;
 import org.apache.catalina.session.StandardSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +29,8 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
     private final Logger log;
 
     private Manager manager;
+
+    private boolean spyEnabled;
 
     private SessionFlushValve sessionFlushValve;
 
@@ -76,6 +75,16 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
 
 
     @Override
+    public boolean isSpyEnabled() {
+        return spyEnabled;
+    }
+
+    @Override
+    public void setSpyEnabled(boolean enabled) {
+        spyEnabled = enabled;
+    }
+
+    @Override
     public boolean isSessionFlushValveEnabled() {
         return sessionFlushValve != null;
     }
@@ -99,6 +108,10 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
         lock.writeLock().lock();
         try {
             backend = createBackend();
+            if (spyEnabled) {
+                log.info("Enabling backend spy");
+                backend = new BackendSpy(backend);
+            }
             backend.init();
         } finally {
             lock.writeLock().unlock();
@@ -106,29 +119,33 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
     }
 
     @Override
-    public void doStart() {
+    public void doStart() throws LifecycleException {
         lock.writeLock().lock();
         try {
             if (sessionFlushValve != null) {
-                log.debug("adding session flush valve");
+                log.info("Enabling session flush valve");
                 Tomcat.getAdapterInstance().getPipeline(this).addValve(sessionFlushValve);
             }
             backend.start();
+        } catch (IOException e) {
+            throw new LifecycleException(e);
         } finally {
             lock.writeLock().unlock();
         }
     }
 
     @Override
-    public void doStop() {
+    public void doStop() throws LifecycleException {
         lock.writeLock().lock();
         try {
             if (sessionFlushValve != null) {
-                log.debug("removing session flush valve");
+                log.info("Disabling session flush valve");
                 Tomcat.getAdapterInstance().getPipeline(this).removeValve(sessionFlushValve);
                 sessionFlushValve = null;
             }
             backend.stop();
+        } catch (IOException e) {
+            throw new LifecycleException(e);
         } finally {
             lock.writeLock().unlock();
         }
@@ -180,7 +197,7 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
 
     @Override
     public void save(Session session) throws IOException {
-        log.debug("saving session {}", session.getId());
+        log.debug("Saving session {}", session.getId());
         lock.readLock().lock();
         try {
             backend.put(idToBytes(session.getId()), sessionToBytes((StandardSession) session));
@@ -191,7 +208,7 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
 
     @Override
     public Session load(String id) throws ClassNotFoundException, IOException {
-        log.debug("loading session {}", id);
+        log.debug("Loading session {}", id);
         lock.readLock().lock();
         try {
             return sessionFromBytes(backend.get(idToBytes(id)));
@@ -202,7 +219,7 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
 
     @Override
     public void remove(String id) throws IOException {
-        log.debug("removing session {}", id);
+        log.debug("Removing session {}", id);
         lock.readLock().lock();
         try {
             backend.remove(idToBytes(id));
@@ -213,7 +230,7 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
 
     @Override
     public int getSize() throws IOException {
-        log.debug("getting session count");
+        log.debug("Getting session count");
         lock.readLock().lock();
         try {
             return backend.size();
@@ -224,7 +241,7 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
 
     @Override
     public String[] keys() throws IOException {
-        log.debug("getting session keys");
+        log.debug("Getting session keys");
         lock.readLock().lock();
         try {
             byte[][] keyBytesArray = backend.keys();
@@ -241,7 +258,7 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
 
     @Override
     public void clear() throws IOException {
-        log.debug("clearing sessions");
+        log.debug("Clearing sessions");
         lock.readLock().lock();
         try {
             backend.clear();

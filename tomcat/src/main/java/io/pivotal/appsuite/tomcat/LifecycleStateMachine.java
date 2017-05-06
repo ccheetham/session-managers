@@ -79,7 +79,7 @@ public class LifecycleStateMachine implements Lifecycle {
 
         private State(LifecycleState lifecycleState) {
             this.lifecycleState = lifecycleState;
-            log.debug("transitioning to {}", getStateName());
+            log.debug("Transitioning to {}", getStateName());
         }
 
         @Override

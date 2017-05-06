@@ -29,7 +29,7 @@ public class Tomcat {
             String className =
                     String.format("io.pivotal.appsuite.tomcat.v%1$s.Tomcat%1$sAdapter", major);
             try {
-                log.debug("loading tomcat adapter {}", className);
+                log.debug("Loading tomcat adapter {}", className);
                 adapter = (TomcatAdapter) Class.forName(className).newInstance();
             } catch (Throwable t) {
                 throw new ExceptionInInitializerError("unable to load tomcat adapter " + className + ": " + t);
