@@ -1,13 +1,14 @@
 = Pivotal Tomcat Session Stores
 Pivotal AppSuite
 :toc: preamble
-:toclevels: 1
+:toclevels: 2
 :!toc-title:
 ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 :linkattrs:
 :uri-project-build: link:BUILD{outfilesuffix}
 :uri-project-developer: link:DEVELOPER{outfilesuffix}
-:uri-project-jedis: link:jedis/
+:uri-project-tomcat: link:tomcat/README{outfilesuffix}
+:uri-project-jedis: link:jedis/README{outfilesuffix}
 :uri-apache-license: http://www.apache.org/licenses/LICENSE-2.0
 
 This project provides implementations of Tomcat session stores.
@@ -17,9 +18,12 @@ This project provides implementations of Tomcat session stores.
 * Provide a framework for implementing Apache Tomcat session stores
 * Provide Apache Tomcat session store implementations for popular data stores
 
-== Available Tomcat Session Stores
+== Store Help
 
-{uri-project-jedis}[Redis (via Jedis)]::
+{uri-project-tomcat}[Common Help]::
+Redis server and cluster support using the Jedis client libraries.
+
+{uri-project-jedis}[Redis (via Jedis) Help]::
 Redis server and cluster support using the Jedis client libraries.
 
 == Building/Developing
@@ -34,7 +38,7 @@ Quick start:
 
 For more details on building, see the {uri-project-build}[build] documentation.
 
-For more details on developing core features and backends, see the {uri-project-developer}[developer] documentation.
+For more details on developing core features and additional stores, see the {uri-project-developer}[developer] documentation.
 
 == License
 

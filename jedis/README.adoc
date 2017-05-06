@@ -1,56 +1,105 @@
-= Pivotal Redis Session Store (using Jedis)
+= Pivotal Redis Session Stores (using Jedis)
 Pivotal AppSuite
+:toc: preamble
+:toclevels: 2
+:!toc-title:
 ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 :linkattrs:
 :uri-jedis: https://github.com/xetorthio/jedis
 :uri-redis: https://redis.io/
-:uri-session-flush-valve: link:../tomcat/src/main/java/io/pivotal/appsuite/tomcat/SessionFlushValve.java
+:uri-common-configuration: link:../tomcat/README{outfilesuffix}
 
-This sub-project provides an Apache Tomcat session store using the {uri-jedis}[Jedis, window="_new"] client pool library to
-manage sessions in a {uri-redis}[Redis, window="_new"] server.
 
-== Configuration
+This document describes configuration unique the Redis and Redis Cluster stores using the Jedis client.
+Refer to {uri-common-configuration}[common Tomcat configuration] for general configuration help.
 
-Configure Tomcat using `Manager/Store` element in `context.xml`:
+== Redis Store
 
-[source,xml]
+A store using a Jedis client to connect with a Redis datastore.
+
+className:: `io.pivotal.appsuite.tomcat.jedis.RedisStore`
+
+=== Host Name
+
+The Redis datastore host name.
+
+property:: `host`
+default:: `localhost`
+
+=== Port Number
+
+The Redis datastore port number.
+
+property:: `host`
+default:: `6379`
+
+=== Database Number
+
+The Redis datastore database number.
+
+property:: `database`
+default:: `0`
+
+=== Password
+
+The Redis datastore `AUTH` password.
+
+property:: `password`
+default:: _none_
+
+=== Client Connection Timeout
+
+The Redis client connection timeout in milliseconds.
+
+property:: `connectionTimeout`
+default:: `2000`
+
+=== Client Connection Pool Size
+
+The Redis client connection pool size.
+
+property:: `connectionPoolSize`
+default:: `8`
+
+== Redis Cluster Store
+
+
+A store using a Jedis cluster client to connect with a Redis datastore cluster.
+
+className:: `io.pivotal.appsuite.tomcat.jedis.RedisClusterStore`
+
+=== Host Names and Ports
+
+The Redis cluster host name and port pairs in comma-separated list.
+
+property:: `hostPorts`
+default:: `localhost`
+
+Examples:
+
+[source]
 ----
-<Context>
-    ....
-    <Manager className="org.apache.catalina.session.PersistentManager">
-        <Store className="io.pivotal.appsuite.tomcat.jedis.RedisStore" />
-    </Manager>
-    ....
-</Context>
+hostPorts="node0,node1"
+hostPorts="node0:1234,node1:4321"
 ----
 
-Override store default properties by adding attibutes to the `Manager/Store` element in `context.xml`:
+=== Password
 
-[source,xml]
-----
-<Context>
-    ....
-    <Manager className="org.apache.catalina.session.PersistentManager">
-        <Store className="io.pivotal.appsuite.tomcat.jedis.RedisStore"
-            host="myhost"
-            port="1234"
-            database="1"
-            password="mysecret"
-            connectionTimeout="5000"
-            connectionPoolSize="10"
-            sessionFlushValveEnabled="true"
-        />
-    </Manager>
-    ....
-</Context>
-----
+The Redis cluster `AUTH` password.
 
-Properties:
+property:: `password`
+default:: _none_
 
-`host`:: Redis host (default `localhost`)
-`port`:: Redis port (default `6379`)
-`database`:: Redis database (default `0`)
-`password`:: Redis password (no default)
-`connectionTimeout`:: Redis connection timeout in milliseconds (default `2000`)
-`connectionPoolSize`:: Redis connection pool size (default `8`)
-`sessionFlushValveEnabled`:: Whether to enable the {uri-session-flush-valve}[SessionFlushValve] (default `false`)
+=== Client Connection Timeout
+
+The Redis cluster client connection timeout in milliseconds.
+
+property:: `connectionTimeout`
+default:: `2000`
+
+=== Client Connection Pool Size
+
+The Redis cluster client connection pool size.
+
+property:: `connectionPoolSize`
+default:: `8`
