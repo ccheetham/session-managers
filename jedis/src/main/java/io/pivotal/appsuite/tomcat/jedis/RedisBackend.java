@@ -13,8 +13,8 @@ import java.nio.charset.Charset;
 import java.util.Set;
 
 /**
- * A {@link Backend} that uses a <a href="https://github.com/xetorthio/jedis" target="_new">Jedis</a> client pool to
- * manage mappings in a <a href="https://redis.io/" target="_new">Redis</a> data store
+ * A {@link Backend} that uses a <a href="https://github.com/xetorthio/jedis" target="_new">Jedis</a> client to
+ * manage mappings in a <a href="https://redis.io/" target="_new">Redis</a> datastore.
  */
 class RedisBackend implements Backend {
 
@@ -34,18 +34,16 @@ class RedisBackend implements Backend {
 
     @Override
     public void init() {
-        log.debug("initializing");
-        log.debug("... host -> {}", this.config.getHost());
-        log.debug("... port -> {}", this.config.getPort());
-        log.debug("... database -> {}", this.config.getDatabase());
-        log.debug("... password? -> {}", this.config.getPassword() != null ? "yes" : "no");
-        log.debug("... connection timeout -> {}ms", this.config.getConnectionTimeout());
-        log.debug("... connection pool size -> {}", this.config.getConnectionPoolSize());
+        log.debug("host -> {}", this.config.getHost());
+        log.debug("port -> {}", this.config.getPort());
+        log.debug("database -> {}", this.config.getDatabase());
+        log.debug("password? -> {}", this.config.getPassword() != null ? "yes" : "no");
+        log.debug("connection timeout -> {}ms", this.config.getConnectionTimeout());
+        log.debug("connection pool size -> {}", this.config.getConnectionPoolSize());
     }
 
     @Override
     public void start() {
-        log.debug("starting");
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(config.getConnectionPoolSize());
         poolConfig.setTestOnBorrow(true);
@@ -58,19 +56,16 @@ class RedisBackend implements Backend {
                 config.getConnectionTimeout(),
                 config.getPassword(),
                 config.getDatabase());
-        log.debug("... redis client -> {}", jedisPool);
     }
 
     @Override
     public void stop() {
-        log.debug("stopping");
         jedisPool.close();
         jedisPool = null;
     }
 
     @Override
     public void put(byte[] key, byte[] value) throws IOException {
-        log.debug("putting {}", new String(key));
         try (Jedis j = jedisPool.getResource()) {
             Transaction t = j.multi();
             t.set(key, value);
@@ -102,9 +97,7 @@ class RedisBackend implements Backend {
         try (Jedis j = jedisPool.getResource()) {
             Transaction t = j.multi();
             t.srem(KEYS, keys);
-            for (int i = 0; i < keys.length; ++i) {
-                t.del(keys[i]);
-            }
+            t.del(keys);
             t.exec();
         }
     }

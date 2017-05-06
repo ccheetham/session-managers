@@ -8,28 +8,24 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Protocol;
 
 /**
- * An Apache Tomcat session store backended by <a href="https://redis.io/" target="_new">Redis</a> datastore.
+ * An Apache Tomcat session store backended by <a href="https://redis.io/" target="_new">Redis</a> datastore cluster.
  */
-public class RedisStore extends BackendStore implements RedisManagement {
+public class RedisClusterStore extends BackendStore implements RedisClusterManagement {
 
     private final Logger log;
 
-    // RedisManagement fields
-    private String host;
-    private int port;
-    private int database;
+    // RedisClusterManagement fields
+    private String hostPorts;
     private String password;
     private int connectionTimeout;
     private int connectionPoolSize;
 
     /**
-     * Create a new {@code RedisStore}.
+     * Create a new {@code RedisClusterStore}.
      */
-    public RedisStore() {
+    public RedisClusterStore() {
         log = LoggerFactory.getLogger(getClass());
-        host = Protocol.DEFAULT_HOST;
-        port = Protocol.DEFAULT_PORT;
-        database = Protocol.DEFAULT_DATABASE;
+        hostPorts = Protocol.DEFAULT_HOST;
         connectionTimeout = Protocol.DEFAULT_TIMEOUT;
         connectionPoolSize = JedisPoolConfig.DEFAULT_MAX_TOTAL;
         password = null;
@@ -38,45 +34,22 @@ public class RedisStore extends BackendStore implements RedisManagement {
 
     @Override
     public Backend createBackend() {
-        return new RedisBackend(this);
+        return new RedisClusterBackend(this);
     }
 
     // -----------------------------------------------------------------------
-    //   RedisManagement implementation
+    //   RedisClusterManagement implementation
     // -----------------------------------------------------------------------
 
 
     @Override
-    public String getHost() {
-        return host;
+    public String getHostPorts() {
+        return hostPorts;
     }
 
     @Override
-    public void setHost(String host) {
-        log.debug("setting host to {}", host);
-        this.host = host;
-    }
+    public void setHostPorts(String hostPorts) {
 
-    @Override
-    public int getPort() {
-        return port;
-    }
-
-    @Override
-    public void setPort(int port) {
-        log.debug("setting port to {}", port);
-        this.port = port;
-    }
-
-    @Override
-    public int getDatabase() {
-        return database;
-    }
-
-    @Override
-    public void setDatabase(int datbase) {
-        log.debug("setting database to {}", database);
-        this.database = database;
     }
 
     @Override
