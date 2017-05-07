@@ -103,3 +103,70 @@ The Redis cluster client connection pool size.
 
 property:: `connectionPoolSize`
 default:: `8`
+
+== Utilities
+
+Run the Gradle task `:jedis:utils` to run the project utilities.  The utilities can be used to view and modify session
+mappings in the Redis datastore.
+
+=== Usage
+
+Run task with `-Pargs=-h` for help:
+
+[source,sh]
+----
+% ./gradlew -q :jedis:utils -Pargs=-h
+usage:
+ -c,--config                Config file
+ -C,--clear                 Clear mappings
+    --database <number>     Redis database
+ -h,--help                  Print this message
+    --host <host>           Redis host
+ -l,--list                  List mapping keys
+    --password <password>   Redis password
+    --port <port>           Redis port
+ -R,--remove <key>          Remove a mapping
+----
+
+=== List Mapping Keys
+
+Run task with `-Pargs=-l` to list mapping keys:
+
+[source,sh]
+----
+% ./gradlew -q :jedis:utils -Pargs=-l
+2152DE5BA209602E62E96AC3D54E7441
+29C0217A187623FBA45322CA0A610E1B
+3C9FFE5FFD846C51847B9C0864B22D7A
+5F64793338C00DAFA6DE2F262FED170E
+60D1B21B74566BBFB6C2334332281E72
+6656EFBF10EB556838BA76AF1A759AFB
+8D1FF8E87850342A18CD18CA7178ABB9
+94606D96416401D43F2F85EE867EDD28
+AF28F16FA1198694E44BE12A6FA9DC75
+BC7C45E0185B6587B375DF6FD3A8B018
+----
+
+=== Remove Mapping
+
+Run task with `-Pargs=-R<key>` to remove a mapping:
+
+[source,sh]
+----
+% ./gradlew -q :jedis:utils -Pargs=-RBC7C45E0185B6587B375DF6FD3A8B018
+mapping removed
+
+# alternatively
+% ./gradlew -q :jedis:utils -Pargs="-R BC7C45E0185B6587B375DF6FD3A8B018"
+...
+----
+
+=== Clear Mappings
+
+Run task with `-Pargs=-C` to clear mappings:
+
+[source,sh]
+----
+% ./gradlew -q :jedis:utils -Pargs=-C
+mappings cleared
+----

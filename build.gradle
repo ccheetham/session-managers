@@ -27,6 +27,25 @@ subprojects {
         mavenCentral()
     }
 
+    configurations {
+        utils
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs += ["src/main/java-tomcat${tomcatVersion}"]
+            }
+        }
+        utils {
+            groovy {
+                srcDirs += ["src/utils/groovy"]
+                compileClasspath += main.output + sourceSets.main.compileClasspath
+                runtimeClasspath += sourceSets.main.runtimeClasspath
+            }
+        }
+    }
+
     dependencies {
         compile "org.slf4j:slf4j-api:${slf4jVersion}"
         testCompile "junit:junit:${junitVersion}"
@@ -34,6 +53,8 @@ subprojects {
         testCompile "org.spockframework:spock-core:${spockVersion}"
         testCompile "cglib:cglib-nodep:${cglibVersion}"
         runtime "org.slf4j:slf4j-jdk14:${slf4jVersion}"
+        utilsCompile localGroovy()
+        utilsRuntime "commons-cli:commons-cli:${commonsCliVersion}"
     }
 
     sourceCompatibility = "1.${javaVersion}"
@@ -42,14 +63,6 @@ subprojects {
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
         if (System.getenv()["JDK${javaVersion}_HOME"])
             options.bootClasspath = "${System.getenv()["JDK${javaVersion}_HOME"]}/jre/lib/rt.jar"
-    }
-
-    sourceSets {
-        main {
-            java {
-                srcDirs = ["src/main/java", "src/main/java-tomcat${tomcatVersion}"]
-            }
-        }
     }
 
     jar.baseName = "${rootProject.name}-tomcat${tomcatVersion}"
@@ -96,4 +109,38 @@ asciidoctor {
 
 task doc() {
     dependsOn javadoc, asciidoctor
+}
+
+
+/*
+ * return an array of args from value of Gradle project property 'args'
+ * -Pargs="foo bar baz"  -> ['foo', 'bar', 'baz']
+ * -Pargs="foo \"bar baz\""  -> ['foo', 'bar baz']
+ */
+def parseArgs() {
+    if (!project.hasProperty('args')) {
+        return []
+    }
+    def parsedArgs = []
+    String concat = ''
+    project.args.split().each {
+        if (it[0] == '"' && it[-1] == '"') {
+            parsedArgs << it[1..-2]
+        } else if (it[0] == '"') {
+            concat += it[1..-1]
+        } else if (it[-1] == '"') {
+            concat += ' '
+            concat += it[0..-2]
+            parsedArgs << concat
+            concat = ''
+        } else {
+            if (concat) {
+                concat += ' '
+                concat += it
+            } else {
+                parsedArgs << it
+            }
+        }
+    }
+    return parsedArgs
 }

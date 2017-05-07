@@ -16,7 +16,7 @@ import java.util.Set;
  * A {@link Backend} that uses a <a href="https://github.com/xetorthio/jedis" target="_new">Jedis</a> client to
  * manage mappings in a <a href="https://redis.io/" target="_new">Redis</a> datastore.
  */
-class RedisBackend implements Backend {
+public class RedisBackend implements Backend {
 
     private final Logger log;
 
@@ -27,7 +27,7 @@ class RedisBackend implements Backend {
 
     private JedisPool jedisPool;
 
-    RedisBackend(RedisConfiguration config) {
+    public RedisBackend(RedisConfiguration config) {
         log = LoggerFactory.getLogger(getClass());
         this.config = config;
     }
