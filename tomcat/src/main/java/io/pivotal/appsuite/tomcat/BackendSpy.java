@@ -127,7 +127,8 @@ public class BackendSpy implements Backend {
         <T> T invoke(Invokeable<T> invokeable, String description) throws IOException {
             Timer t = new Timer();
             T result = invokeable.invoke();
-            log.info("{} {} [{}ms]", backend.getClass().getSimpleName(), description, t.elapsed());
+            double elapsed = t.elapsed();
+            log.info("{} {} [{}ms]", backend.getClass().getSimpleName(), description, elapsed);
             return result;
         }
 
