@@ -39,12 +39,11 @@ Example: _Configure a Store Property_
 === Session Flush Valve
 
 property:: `sessionFlushValveEnabled`
-default:: `false`
+default:: `true`
 
 A store can be configured with a request pipeline valve that flushes sessions to the store after an HTTP request.
-If the Tomcat node is a standalone instance or is a member of a Tomcat cluster, this property should be `false`.
 
-If the store is being used to effect a cluster of Tomcat nodes, then set this property to `true`.
+If the Tomcat node is a member of a Tomcat cluster, this property should be `false`.
 
 When enabled, a `INFO` log message is output when the store is initialized:
 [source]

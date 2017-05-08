@@ -32,6 +32,8 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
 
     private boolean spyEnabled;
 
+    private boolean sessionFlushValveEnabled;
+
     private SessionFlushValve sessionFlushValve;
 
     private Backend backend;
@@ -45,6 +47,8 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
     protected BackendStore() {
         log = LoggerFactory.getLogger(getClass());
         lock = new ReentrantReadWriteLock();
+        spyEnabled = false;
+        sessionFlushValveEnabled = true;
     }
 
     /**
@@ -81,22 +85,19 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
 
     @Override
     public void setSpyEnabled(boolean enabled) {
+        log.debug("Setting spy enabled to {}", enabled);
         spyEnabled = enabled;
     }
 
     @Override
     public boolean isSessionFlushValveEnabled() {
-        return sessionFlushValve != null;
+        return sessionFlushValveEnabled;
     }
 
     @Override
     public void setSessionFlushValveEnabled(boolean enabled) {
-        if (enabled) {
-            sessionFlushValve = Tomcat.getAdapterInstance().createSessionFlushValve();
-            sessionFlushValve.setStore(this);
-        } else {
-            sessionFlushValve = null;
-        }
+        log.debug("Setting session flush valve enabled to {}", enabled);
+        sessionFlushValveEnabled = enabled;
     }
 
     // -----------------------------------------------------------------------
@@ -108,7 +109,7 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
         lock.writeLock().lock();
         try {
             backend = createBackend();
-            if (spyEnabled) {
+            if (isSpyEnabled()) {
                 log.info("Enabling backend spy");
                 backend = new BackendSpy(backend);
             }
@@ -122,8 +123,10 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
     public void doStart() throws LifecycleException {
         lock.writeLock().lock();
         try {
-            if (sessionFlushValve != null) {
+            if (isSessionFlushValveEnabled()) {
                 log.info("Enabling session flush valve");
+                sessionFlushValve = Tomcat.getAdapterInstance().createSessionFlushValve();
+                sessionFlushValve.setStore(this);
                 Tomcat.getAdapterInstance().getPipeline(this).addValve(sessionFlushValve);
             }
             backend.start();
@@ -138,7 +141,7 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
     public void doStop() throws LifecycleException {
         lock.writeLock().lock();
         try {
-            if (sessionFlushValve != null) {
+            if (isSessionFlushValveEnabled()) {
                 log.info("Disabling session flush valve");
                 Tomcat.getAdapterInstance().getPipeline(this).removeValve(sessionFlushValve);
                 sessionFlushValve = null;
