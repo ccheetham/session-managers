@@ -49,7 +49,7 @@ public class RedisClusterStore extends BackendStore implements RedisClusterManag
 
     @Override
     public void setHostPorts(String hostPorts) {
-
+        log.debug("Setting host/ports to {}", hostPorts);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class RedisClusterStore extends BackendStore implements RedisClusterManag
 
     @Override
     public void setPassword(String password) {
-        log.debug("setting password to {}", password);
+        log.debug("Setting password to {}", password);
         this.password = password;
     }
 
@@ -70,7 +70,7 @@ public class RedisClusterStore extends BackendStore implements RedisClusterManag
 
     @Override
     public void setConnectionTimeout(int timeout) {
-        log.debug("setting timeout to {}", timeout);
+        log.debug("Setting timeout to {}", timeout);
         this.connectionTimeout = timeout;
     }
 
@@ -81,7 +81,7 @@ public class RedisClusterStore extends BackendStore implements RedisClusterManag
 
     @Override
     public void setConnectionPoolSize(int size) {
-        log.debug("setting connection pool size to {}", size);
+        log.debug("Setting connection pool size to {}", size);
         this.connectionPoolSize = size;
     }
 
