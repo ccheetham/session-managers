@@ -21,7 +21,7 @@ This project provides implementations of Tomcat session stores.
 == Store Help
 
 {uri-project-tomcat}[Common Help]::
-Redis server and cluster support using the Jedis client libraries.
+Common behavior and configuration of Pivotal Tomcat session stores.
 
 {uri-project-jedis}[Redis (via Jedis) Help]::
 Redis server and cluster support using the Jedis client libraries.
