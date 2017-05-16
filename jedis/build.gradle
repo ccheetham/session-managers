@@ -1,3 +1,23 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.bmuschko:gradle-docker-plugin:3.0.6'
+    }
+}
+
+apply plugin: 'com.bmuschko.docker-remote-api'
+
+import com.bmuschko.gradle.docker.tasks.container.*
+
+def redisImage = "redis:${redisVersion}"
+// grab an ephemeral port for Redis container
+def redisPort = -1
+new ServerSocket(0).withCloseable { sock ->
+    redisPort = sock.localPort
+}
+
 dependencies {
     compile project(':tomcat')
     compile "redis.clients:jedis:${jedisVersion}"
@@ -11,9 +31,32 @@ shadowJar {
     }
 }
 
-task utils(type: JavaExec) {
-    description "Run project utils"
-    main = 'io.pivotal.appsuite.tomcat.redis.utils.Main'
-    classpath = sourceSets.utils.runtimeClasspath
-    args = parseArgs()
+task createRedis(type: DockerCreateContainer) {
+    targetImageId { redisImage as String }
+    portBindings = ["${redisPort}:6379"]
+}
+
+task startRedis(type: DockerStartContainer) {
+    dependsOn createRedis
+    targetContainerId { createRedis.containerId }
+}
+
+task stopRedis(type: DockerStopContainer) {
+    targetContainerId { createRedis.containerId }
+    dependsOn createRedis
+}
+
+task destroyRedis(type: DockerRemoveContainer) {
+    dependsOn stopRedis
+    targetContainerId { createRedis.containerId }
+}
+
+utils {
+    main = 'io.pivotal.appsuite.tomcat.jedis.utils.Main'
+}
+
+integrationTest {
+    dependsOn startRedis
+    finalizedBy destroyRedis
+    systemProperty 'redis.port', redisPort
 }

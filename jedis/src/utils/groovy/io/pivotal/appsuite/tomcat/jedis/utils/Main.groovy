@@ -1,4 +1,4 @@
-package io.pivotal.appsuite.tomcat.redis.utils
+package io.pivotal.appsuite.tomcat.jedis.utils
 
 import io.pivotal.appsuite.tomcat.jedis.RedisBackend
 import io.pivotal.appsuite.tomcat.jedis.RedisConfiguration

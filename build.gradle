@@ -27,33 +27,41 @@ subprojects {
         mavenCentral()
     }
 
-    configurations {
-        utils
-    }
-
     sourceSets {
         main {
             java {
                 srcDirs += ["src/main/java-tomcat${tomcatVersion}"]
             }
         }
+        integrationTest {
+            groovy {
+                srcDir 'src/integration-test/groovy'
+                compileClasspath += main.output + main.compileClasspath
+                runtimeClasspath += main.runtimeClasspath
+            }
+        }
         utils {
             groovy {
-                srcDirs += ["src/utils/groovy"]
-                compileClasspath += main.output + sourceSets.main.compileClasspath
-                runtimeClasspath += sourceSets.main.runtimeClasspath
+                srcDir 'src/utils/groovy'
+                compileClasspath += main.output + main.compileClasspath
+                runtimeClasspath += main.runtimeClasspath
             }
         }
     }
 
+    configurations {
+        integrationTestCompile.extendsFrom testCompile
+        integrationTestRuntime.extendsFrom testRuntime
+    }
+
     dependencies {
         compile "org.slf4j:slf4j-api:${slf4jVersion}"
+        runtime "org.slf4j:slf4j-jdk14:${slf4jVersion}"
         testCompile "junit:junit:${junitVersion}"
         testCompile "org.codehaus.groovy:groovy:${groovyVersion}"
         testCompile "org.spockframework:spock-core:${spockVersion}"
         testCompile "cglib:cglib-nodep:${cglibVersion}"
-        runtime "org.slf4j:slf4j-jdk14:${slf4jVersion}"
-        utilsCompile localGroovy()
+        utilsCompile "org.codehaus.groovy:groovy:${groovyVersion}"
         utilsRuntime "commons-cli:commons-cli:${commonsCliVersion}"
     }
 
@@ -63,6 +71,20 @@ subprojects {
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
         if (System.getenv()["JDK${javaVersion}_HOME"])
             options.bootClasspath = "${System.getenv()["JDK${javaVersion}_HOME"]}/jre/lib/rt.jar"
+    }
+
+    task utils(type: JavaExec) {
+        description "Run project utils"
+        classpath = sourceSets.utils.runtimeClasspath
+        args = parseArgs()
+    }
+
+    task integrationTest(type: Test) {
+        description 'Runs the integration tests.'
+        group = 'Verification'
+        testClassesDir = sourceSets.integrationTest.output.classesDir
+        classpath = sourceSets.integrationTest.runtimeClasspath
+        outputs.upToDateWhen { false }
     }
 
     jar.baseName = "${rootProject.name}-tomcat${tomcatVersion}"

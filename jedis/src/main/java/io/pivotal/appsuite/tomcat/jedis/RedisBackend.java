@@ -94,6 +94,9 @@ public class RedisBackend implements Backend {
     @Override
     public void clear() throws IOException {
         byte[][] keys = keys();
+        if (keys.length == 0) {
+            return;
+        }
         try (Jedis j = jedisPool.getResource()) {
             Transaction t = j.multi();
             t.srem(KEYS, keys);
