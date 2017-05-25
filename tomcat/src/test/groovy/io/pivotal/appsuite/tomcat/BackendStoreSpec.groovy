@@ -115,7 +115,7 @@ class BackendStoreSpec extends Specification {
 
     def "remove(id)"() {
         given:
-        def id = "loadsession"
+        def id = "removesession"
         Session session = session(id)
         store.start()
         store.save(session)
