@@ -41,7 +41,7 @@
         <jedis.version>2.9.0</jedis.version>
         <junit.version>4.12</junit.version>
         <mockito.version>1.9.5</mockito.version>
-        <tomcat.version>7.0.54</tomcat.version>
+        <tomcat.version>8.0.43</tomcat.version>
         <slf4j.version>1.7.24</slf4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

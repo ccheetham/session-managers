@@ -237,7 +237,6 @@ public final class RedisStore extends AbstractLifecycle implements RedisStoreMan
         });
     }
 
-    @Override
     public String getInfo() {
         return INFO;
     }

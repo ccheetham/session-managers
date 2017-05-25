@@ -90,7 +90,6 @@ public final class SessionFlushValve extends AbstractLifecycle implements Contai
         });
     }
 
-    @Override
     public String getInfo() {
         return INFO;
     }

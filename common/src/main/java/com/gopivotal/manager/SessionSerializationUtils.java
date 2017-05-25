@@ -16,9 +16,12 @@
 
 package com.gopivotal.manager;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.session.StandardSession;
+import org.apache.catalina.util.CustomObjectInputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -60,25 +63,18 @@ public final class SessionSerializationUtils {
         ByteArrayInputStream bytes = null;
         ObjectInputStream in = null;
 
+        Context context = this.manager.getContext();
+        ClassLoader loader = context.bind(Globals.IS_SECURITY_ENABLED, null);
         try {
             bytes = new ByteArrayInputStream(session);
-            in = new ObjectInputStream(bytes) {
-                @Override
-                protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-                    try {
-                        return Class.forName(desc.getName(), false, Thread.currentThread().getContextClassLoader());
-                    } catch (ClassNotFoundException cnfe) {
-                        return super.resolveClass(desc);
-                    }
-                }
-            };
-
+            in = new CustomObjectInputStream(bytes, Thread.currentThread().getContextClassLoader());
             StandardSession standardSession = (StandardSession) this.manager.createEmptySession();
             standardSession.readObjectData(in);
-
+            standardSession.setManager(this.manager);
             return standardSession;
         } finally {
             closeQuietly(in, bytes);
+            context.unbind(Globals.IS_SECURITY_ENABLED, loader);
         }
     }
 
