@@ -16,9 +16,12 @@
 
 package com.gopivotal.manager;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.Loader;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.session.StandardSession;
+import org.apache.catalina.util.CustomObjectInputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -60,24 +63,27 @@ public final class SessionSerializationUtils {
         ByteArrayInputStream bytes = null;
         ObjectInputStream in = null;
 
+        Context context = ((Context) this.manager.getContainer());
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader tomcatClassLoader = null;
+        if (context != null) {
+            Loader loader = context.getLoader();
+            if (loader != null) {
+                tomcatClassLoader = loader.getClassLoader();
+            }
+        }
+        if (tomcatClassLoader != null) {
+            Thread.currentThread().setContextClassLoader(tomcatClassLoader);
+        }
         try {
             bytes = new ByteArrayInputStream(session);
-            in = new ObjectInputStream(bytes) {
-                @Override
-                protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-                    try {
-                        return Class.forName(desc.getName(), false, Thread.currentThread().getContextClassLoader());
-                    } catch (ClassNotFoundException cnfe) {
-                        return super.resolveClass(desc);
-                    }
-                }
-            };
-
+            in = new CustomObjectInputStream(bytes, tomcatClassLoader);
             StandardSession standardSession = (StandardSession) this.manager.createEmptySession();
             standardSession.readObjectData(in);
-
+            standardSession.setManager(this.manager);
             return standardSession;
         } finally {
+            Thread.currentThread().setContextClassLoader(originalClassLoader);
             closeQuietly(in, bytes);
         }
     }
