@@ -43,7 +43,7 @@ public class Tomcat {
      *
      * @param instance {@code TomcatAdapter} instance
      */
-    public static synchronized void  setAdapterInstance(TomcatAdapter instance) {
+    public static synchronized void setAdapterInstance(TomcatAdapter instance) {
         adapter = instance;
     }
 
