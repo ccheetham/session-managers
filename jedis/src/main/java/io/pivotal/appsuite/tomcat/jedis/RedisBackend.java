@@ -66,28 +66,37 @@ public class RedisBackend implements Backend {
 
     @Override
     public void put(byte[] key, byte[] value) throws IOException {
-        try (Jedis j = jedisPool.getResource()) {
+        Jedis j = jedisPool.getResource();
+        try {
             Transaction t = j.multi();
             t.set(key, value);
             t.sadd(KEYS, key);
             t.exec();
+        } finally {
+            j.close();
         }
     }
 
     @Override
     public byte[] get(byte[] key) throws IOException {
-        try (Jedis j = jedisPool.getResource()) {
+        Jedis j = jedisPool.getResource();
+        try {
             return j.get(key);
+        } finally {
+            j.close();
         }
     }
 
     @Override
     public void remove(byte[] key) throws IOException {
-        try (Jedis j = jedisPool.getResource()) {
+        Jedis j = jedisPool.getResource();
+        try {
             Transaction t = j.multi();
             t.srem(KEYS, key);
             t.del(key);
             t.exec();
+        } finally {
+            j.close();
         }
     }
 
@@ -97,25 +106,34 @@ public class RedisBackend implements Backend {
         if (keys.length == 0) {
             return;
         }
-        try (Jedis j = jedisPool.getResource()) {
+        Jedis j = jedisPool.getResource();
+        try {
             Transaction t = j.multi();
             t.srem(KEYS, keys);
             t.del(keys);
             t.exec();
+        } finally {
+            j.close();
         }
     }
 
     @Override
     public int size() throws IOException {
-        try (Jedis j = jedisPool.getResource()) {
+        Jedis j = jedisPool.getResource();
+        try {
             return j.scard(KEYS).intValue();
+        } finally {
+            j.close();
         }
     }
 
     @Override
     public byte[][] keys() throws IOException {
-        try (Jedis j = jedisPool.getResource()) {
+        Jedis j = jedisPool.getResource();
+        try {
             return j.smembers(KEYS).toArray(new byte[0][]);
+        } finally {
+            j.close();
         }
     }
 

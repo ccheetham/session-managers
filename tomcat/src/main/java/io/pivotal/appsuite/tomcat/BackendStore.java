@@ -299,11 +299,14 @@ public abstract class BackendStore extends AbstractLifecycle implements Store, B
 
 
     private byte[] sessionToBytes(StandardSession session) throws IOException {
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
-             ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        try {
             session.writeObjectData(oos);
             oos.flush();
             return bos.toByteArray();
+        } finally {
+            oos.close();
         }
     }
 

@@ -48,14 +48,19 @@ public class Tomcat9Adapter implements TomcatAdapter {
             }
         }
         Thread.currentThread().setContextClassLoader(tomcatClassLoader);
-        try (ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-             ObjectInputStream ois = new CustomObjectInputStream(bis, tomcatClassLoader)) {
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        ObjectInputStream ois = new CustomObjectInputStream(bis, tomcatClassLoader);
+        try {
             StandardSession session = (StandardSession) manager.createEmptySession();
             session.readObjectData(ois);
             session.setManager(manager);
             return (session);
         } finally {
-            Thread.currentThread().setContextClassLoader(originalClassLoader);
+            try {
+                ois.close();
+            } finally {
+                Thread.currentThread().setContextClassLoader(originalClassLoader);
+            }
         }
     }
 

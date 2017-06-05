@@ -34,14 +34,19 @@ public class Tomcat8Adapter implements TomcatAdapter {
         Manager manager = store.getManager();
         Context context = manager.getContext();
         ClassLoader originalClassLoader = context.bind(Globals.IS_SECURITY_ENABLED, null);
-        try (ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-             ObjectInputStream ois = new CustomObjectInputStream(bis, Thread.currentThread().getContextClassLoader())) {
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        ObjectInputStream ois = new CustomObjectInputStream(bis, Thread.currentThread().getContextClassLoader());
+        try {
             StandardSession session = (StandardSession) manager.createEmptySession();
             session.readObjectData(ois);
             session.setManager(manager);
             return session;
         } finally {
-            context.unbind(Globals.IS_SECURITY_ENABLED, originalClassLoader);
+            try {
+                ois.close();
+            } finally {
+                context.unbind(Globals.IS_SECURITY_ENABLED, originalClassLoader);
+            }
         }
     }
 
