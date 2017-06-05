@@ -20,7 +20,7 @@ public class RedisBackend implements Backend {
 
     private final Logger log;
 
-    // Key to Redis structure maintains session ID ist.
+    // Key to Redis structure maintains session ID list.
     private static final byte[] KEYS = "sessions".getBytes(Charset.forName("UTF-8"));
 
     private RedisConfiguration config;
