@@ -2,7 +2,7 @@
 .DS_Store
 
 /.gradle
-/build
+build
 
 # IntelliJ
 /.idea

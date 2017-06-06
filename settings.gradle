@@ -1,3 +1,8 @@
 rootProject.name = 'pivotal-session-stores'
 include 'tomcat'
+include 'tomcat:tomcat-core'
+include 'tomcat:tomcat-v9'
+include 'tomcat:tomcat-v85'
+include 'tomcat:tomcat-v8'
+include 'tomcat:tomcat-v7'
 include 'jedis'

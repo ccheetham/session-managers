@@ -19,7 +19,7 @@ new ServerSocket(0).withCloseable { sock ->
 }
 
 dependencies {
-    compile project(':tomcat')
+    compile project(':tomcat:tomcat-core')
     compile "redis.clients:jedis:${jedisVersion}"
 }
 

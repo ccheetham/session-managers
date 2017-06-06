@@ -1,0 +1,13 @@
+dependencies {
+    compile project(':tomcat:tomcat-core')
+    compile(
+            group: 'org.apache.tomcat',
+            name: 'tomcat-catalina',
+            version: tomcat8Version
+    )
+    testCompile(
+            group: 'org.apache.tomcat',
+            name: 'tomcat-coyote',
+            version: tomcat8Version
+    )
+}

@@ -8,19 +8,9 @@ This document describes how to build this project.
 
 == Requirements
 
-A JDK, version 7 or higher.
+A JDK, version 7 or higher, to run Gradle.
 
-This project targets JDK 7. If you use JDK 8 or higher, you will see the following warning when using Gradle:
-[source,sh]
-----
-:common:compileJava
-warning: [options] bootstrap class path not set in conjunction with -source 1.7
-1 warning
-----
-
-If you have JDK 7 available, set the env var `JDK7_HOME` to its path and it will be used for the Java compile bootstrap.
-
-NOTE: If building for Tomcat 9, JDK 8 is required.
+NOTE: Although a Java 7+ VM is required to build, this project targets Java 6+ VM compatibility.
 
 == Building
 
@@ -30,21 +20,11 @@ To build the entire project:
 % ./gradlew assemble
 ----
 
-To build an individual store:
+To build an individual module, e.g. named `MODULE`:
 
 [source,sh]
 ----
-% ./gradlew :STORE:assemble
-----
-
-The build is specific to a version of Tomcat, one of `7`, `8`, `85`, or `9`.
-The Tomcat version is configured by the `tomcatVersion` Gradle property in the project root's `gradle.properties`.
-Generated jar file names include the Tomcat version to identify which jar supports which version of Tomcat.
-
-To build for a different version of Tomcat, you can specify the property at the commandline.  For example, to build all versions:
-[source,sh]
-----
-% for v in 7 8 85 9; do ./gradlew assemble -PtomcatVersion=$v; done
+% ./gradlew :MODULE:assemble
 ----
 
 To build project documentation:

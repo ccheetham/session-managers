@@ -28,11 +28,6 @@ subprojects {
     }
 
     sourceSets {
-        main {
-            java {
-                srcDirs += ["src/main/java-tomcat${tomcatVersion}"]
-            }
-        }
         integrationTest {
             groovy {
                 srcDir 'src/integration-test/groovy'
@@ -69,8 +64,6 @@ subprojects {
     targetCompatibility = "1.${javaVersion}"
     compileJava {
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-        if (System.getenv()["JDK${javaVersion}_HOME"])
-            options.bootClasspath = "${System.getenv()["JDK${javaVersion}_HOME"]}/jre/lib/rt.jar"
     }
 
     task utils(type: JavaExec) {
@@ -87,9 +80,8 @@ subprojects {
         outputs.upToDateWhen { false }
     }
 
-    jar.baseName = "${rootProject.name}-tomcat${tomcatVersion}"
-    if (name != 'tomcat') {
-        jar.baseName += "-${name}"
+    jar.baseName = "${rootProject.name}-${project.name}"
+    if (!name.startsWith('tomcat')) {
         apply plugin: 'com.github.johnrengelman.shadow'
         shadowJar {
             baseName = jar.baseName
