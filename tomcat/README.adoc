@@ -17,9 +17,8 @@ Example: _Configure a Store_
 [source,xml]
 ----
 <Context>
-    <Manager className="org.apache.catalina.session.PersistentManager">
-        <Store className="com.widgets.MyWidgetStore" />
-    </Manager>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="com.widgets.MyWidgetStore" />
 ----
 
 == Store Properties
@@ -30,10 +29,9 @@ Example: _Configure a Store Property_
 [source,xml]
 ----
 <Context>
-    <Manager className="org.apache.catalina.session.PersistentManager">
-        <Store className="com.widgets.MyWidgetStore"
-               myProperty="myPropertyValue" />
-    </Manager>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="com.widgets.MyWidgetStore"
+           myProperty="myPropertyValue" />
 ----
 
 === Session Flush Valve
@@ -49,6 +47,15 @@ When enabled, a `INFO` log message is output when the store is initialized:
 [source]
 ----
 Enabling session flush valve
+----
+
+Example: _Disabling the Session Flush Valve_
+[source,xml]
+----
+<Context>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="com.widgets.MyWidgetStore"
+           sessionFlushValveEnabled="false" />
 ----
 
 === BackendSpy
@@ -78,3 +85,12 @@ MyWidget stopping [0.669562ms]
 ----
 
 NOTE: the backend spy uses the logger named by the backend's class name.
+
+Example: _Enabling the Backend Spy_
+[source,xml]
+----
+<Context>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="com.widgets.MyWidgetStore"
+           backendSpyEnabled="true" />
+----

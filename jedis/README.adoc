@@ -19,6 +19,14 @@ A store using a Jedis client to connect with a Redis datastore.
 
 className:: `io.pivotal.appsuite.tomcat.jedis.RedisStore`
 
+Example: _Configure a Redis Store_
+[source,xml]
+----
+<Context>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="io.pivotal.appsuite.tomcat.jedis.RedisStore" />
+----
+
 === Host Name
 
 The Redis datastore host name.
@@ -26,12 +34,30 @@ The Redis datastore host name.
 property:: `host`
 default:: `localhost`
 
+Example: _Configure a Redis Store Host Name_
+[source,xml]
+----
+<Context>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="io.pivotal.appsuite.tomcat.jedis.RedisStore"
+           host="myredishost" />
+----
+
 === Port Number
 
 The Redis datastore port number.
 
-property:: `host`
+property:: `port`
 default:: `6379`
+
+Example: _Configure a Redis Store Port Number_
+[source,xml]
+----
+<Context>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="io.pivotal.appsuite.tomcat.jedis.RedisStore"
+           port="16379" />
+----
 
 === Database Number
 
@@ -40,12 +66,30 @@ The Redis datastore database number.
 property:: `database`
 default:: `0`
 
+Example: _Configure a Redis Store Database Number_
+[source,xml]
+----
+<Context>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="io.pivotal.appsuite.tomcat.jedis.RedisStore"
+           database="1" />
+----
+
 === Password
 
 The Redis datastore `AUTH` password.
 
 property:: `password`
 default:: _none_
+
+Example: _Configure a Redis Store Password_
+[source,xml]
+----
+<Context>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="io.pivotal.appsuite.tomcat.jedis.RedisStore"
+           password="mysecret" />
+----
 
 === Client Connection Timeout
 
@@ -54,6 +98,15 @@ The Redis client connection timeout in milliseconds.
 property:: `connectionTimeout`
 default:: `2000`
 
+Example: _Configure a Redis Store Client Connection Timeout_
+[source,xml]
+----
+<Context>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="io.pivotal.appsuite.tomcat.jedis.RedisStore"
+           connectionTimeout="10000" />
+----
+
 === Client Connection Pool Size
 
 The Redis client connection pool size.
@@ -61,12 +114,28 @@ The Redis client connection pool size.
 property:: `connectionPoolSize`
 default:: `8`
 
-== Redis Cluster Store
+Example: _Configure a Redis Store Client Connection Pool Size_
+[source,xml]
+----
+<Context>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="io.pivotal.appsuite.tomcat.jedis.RedisStore"
+           connectionPoolSize="12" />
+----
 
+== Redis Cluster Store
 
 A store using a Jedis cluster client to connect with a Redis datastore cluster.
 
 className:: `io.pivotal.appsuite.tomcat.jedis.RedisClusterStore`
+
+Example: _Configure a Redis Cluster Store_
+[source,xml]
+----
+<Context>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="io.pivotal.appsuite.tomcat.jedis.RedisClusterStore" />
+----
 
 === Host Names and Ports
 
@@ -75,12 +144,13 @@ The Redis cluster host name and port pairs in comma-separated list.
 property:: `hostPorts`
 default:: `localhost`
 
-Examples:
-
-[source]
+Example: _Configure a Redis Cluster Store Host Names and Ports_
+[source,xml]
 ----
-hostPorts="node0,node1"
-hostPorts="node0:1234,node1:4321"
+<Context>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="io.pivotal.appsuite.tomcat.jedis.RedisClusterStore"
+           hostPorts="node0:1234,node1:4321" />
 ----
 
 === Password
@@ -90,6 +160,15 @@ The Redis cluster `AUTH` password.
 property:: `password`
 default:: _none_
 
+Example: _Configure a Redis Cluster Store Password_
+[source,xml]
+----
+<Context>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="io.pivotal.appsuite.tomcat.jedis.RedisClusterStore"
+           password="mysecret" />
+----
+
 === Client Connection Timeout
 
 The Redis cluster client connection timeout in milliseconds.
@@ -97,12 +176,30 @@ The Redis cluster client connection timeout in milliseconds.
 property:: `connectionTimeout`
 default:: `2000`
 
+Example: _Configure a Redis Cluster Store Client Connection Timeout_
+[source,xml]
+----
+<Context>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="io.pivotal.appsuite.tomcat.jedis.RedisClusterStore"
+           connectionTimeout="10000" />
+----
+
 === Client Connection Pool Size
 
 The Redis cluster client connection pool size.
 
 property:: `connectionPoolSize`
 default:: `8`
+
+Example: _Configure a Redis Cluster Store Client Connection Pool Size_
+[source,xml]
+----
+<Context>
+  <Manager className="org.apache.catalina.session.PersistentManager">
+    <Store className="io.pivotal.appsuite.tomcat.jedis.RedisClusterStore"
+           connectionPoolSize="12" />
+----
 
 == Utilities
 
